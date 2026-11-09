@@ -5,9 +5,9 @@ Esta es la carpeta de trabajo principal. Cada guía se implementa aquí de
 forma acumulativa; las carpetas gestor-de-tareas-sesionXX se usan únicamente
 como referencia.
 
-Estado actual: Sesión 21 completada
+Estado actual: Sesión 22 completada
 -----------------------------------
-- Gestor de tareas funcional con persistencia en localStorage.
+- Gestor de tareas funcional con persistencia estructurada en IndexedDB.
 - Web App Manifest enlazado desde index.html.
 - Nombre, colores, orientación y modo standalone configurados.
 - Iconos de 192x192 y 512x512, incluido el icono maskable.
@@ -21,6 +21,9 @@ Estado actual: Sesión 21 completada
 - Estrategia Network First preparada para rutas de API.
 - Estrategia Stale-While-Revalidate aplicada al shell de la aplicación.
 - Estrategias enrutadas según el tipo de recurso solicitado.
+- Base de datos versionada con índices por prioridad y título.
+- Operaciones CRUD y consultas mediante cursor sobre las tareas.
+- Notas privadas cifradas con AES-GCM y claves derivadas con PBKDF2.
 
 Cómo abrirlo
 ------------
@@ -35,9 +38,11 @@ Estructura actual
 -----------------
   index.html               interfaz y enlace al manifest
   manifest.json            configuración de instalación de la PWA
-  sw.js                    ciclo de vida inicial del Service Worker
+  sw.js                    Service Worker y estrategias de caché
   icons/                   iconos normal y maskable
   css/estilos.css          estilos
-  app.js                   punto de entrada
-  tareas.js                lógica y persistencia de las tareas
+  app.js                   punto de entrada y flujo de notas privadas
+  tareas.js                lógica y representación de las tareas
+  db.js                    persistencia estructurada con IndexedDB
+  crypto.js                derivación, cifrado, descifrado y hash
   referencia-typescript/   versión TypeScript solo como referencia

@@ -1,9 +1,11 @@
-const CACHE_ACTUAL = "gestor-tareas-v2";
+const CACHE_ACTUAL = "gestor-tareas-v3";
 const CORE_ASSETS = [
   "/index.html",
   "/css/estilos.css",
   "/app.js",
   "/tareas.js",
+  "/db.js",
+  "/crypto.js",
   "/manifest.json",
 ];
 
