@@ -1,0 +1,33 @@
+Gestor de Tareas — proyecto acumulativo
+Electiva - PWA · UPTC
+
+Esta es la carpeta de trabajo principal. Cada guía se implementa aquí de
+forma acumulativa; las carpetas gestor-de-tareas-sesionXX se usan únicamente
+como referencia.
+
+Estado actual: Sesión 16 completada
+-----------------------------------
+- Gestor de tareas funcional con persistencia en localStorage.
+- Web App Manifest enlazado desde index.html.
+- Nombre, colores, orientación y modo standalone configurados.
+- Iconos de 192x192 y 512x512, incluido el icono maskable.
+- El Service Worker todavía no existe; se agregará en la Sesión 17.
+
+Cómo abrirlo
+------------
+Este proyecto usa módulos de JavaScript y debe ejecutarse desde un servidor
+local. Desde esta carpeta:
+
+  python3 -m http.server 8080
+
+Luego abre http://localhost:8080 en el navegador.
+
+Estructura actual
+-----------------
+  index.html               interfaz y enlace al manifest
+  manifest.json            configuración de instalación de la PWA
+  icons/                   iconos normal y maskable
+  css/estilos.css          estilos
+  app.js                   punto de entrada
+  tareas.js                lógica y persistencia de las tareas
+  referencia-typescript/   versión TypeScript solo como referencia

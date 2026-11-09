@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1A1A1A">
+<title>Gestor de Tareas</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <main class="app">
+    <header class="cabecera">
+      <p class="etiqueta">Cuaderno de trabajo</p>
+      <h1>Mis <span>tareas</span></h1>
+      <p class="subtitulo">Un lugar sencillo para organizar lo que sigue.</p>
+    </header>
+
+    <form id="form-tarea" class="form-tarea">
+      <div class="campo">
+        <label for="input-titulo">Nueva tarea</label>
+        <input type="text" id="input-titulo" placeholder="¿Qué tienes pendiente?" required>
+      </div>
+      <div class="campo">
+        <label for="input-prioridad">Prioridad</label>
+        <select id="input-prioridad">
+          <option value="baja">Baja</option>
+          <option value="media" selected>Media</option>
+          <option value="alta">Alta</option>
+        </select>
+      </div>
+      <button type="submit">Agregar</button>
+    </form>
+
+    <section aria-labelledby="titulo-lista">
+      <div class="encabezado-lista">
+        <h2 id="titulo-lista">Pendientes</h2>
+        <p>Marca al terminar</p>
+      </div>
+      <ul id="lista-tareas" class="lista-tareas"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
