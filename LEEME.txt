@@ -5,7 +5,7 @@ Esta es la carpeta de trabajo principal. Cada guía se implementa aquí de
 forma acumulativa; las carpetas gestor-de-tareas-sesionXX se usan únicamente
 como referencia.
 
-Estado actual: Sesión 18 completada
+Estado actual: Sesión 19 completada
 -----------------------------------
 - Gestor de tareas funcional con persistencia en localStorage.
 - Web App Manifest enlazado desde index.html.
@@ -14,6 +14,8 @@ Estado actual: Sesión 18 completada
 - Service Worker registrado con eventos install, activate y fetch.
 - Recursos esenciales preparados durante la instalación.
 - Respuesta desde caché para recursos disponibles y red como respaldo.
+- Caché versionada como gestor-tareas-v2.
+- Eliminación automática de versiones antiguas durante la activación.
 
 Cómo abrirlo
 ------------

@@ -1,4 +1,4 @@
-const CACHE_NAME = "gestor-tareas-v1";
+const CACHE_ACTUAL = "gestor-tareas-v2";
 const CORE_ASSETS = [
   "/index.html",
   "/css/estilos.css",
@@ -9,12 +9,23 @@ const CORE_ASSETS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS))
+    caches.open(CACHE_ACTUAL).then((cache) => cache.addAll(CORE_ASSETS))
   );
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches
+      .keys()
+      .then((nombres) =>
+        Promise.all(
+          nombres
+            .filter((nombre) => nombre !== CACHE_ACTUAL)
+            .map((nombre) => caches.delete(nombre))
+        )
+      )
+      .then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener("fetch", (event) => {
