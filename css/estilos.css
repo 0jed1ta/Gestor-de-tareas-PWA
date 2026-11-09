@@ -204,9 +204,7 @@ h1 span {
 
 .tarea {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 14px;
-  align-items: center;
+  gap: 10px;
   min-height: 58px;
   padding: 10px 12px;
   background: rgba(255, 255, 255, 0.88);
@@ -214,6 +212,13 @@ h1 span {
   border-left: 7px solid #7191c9;
   border-radius: 3px;
   transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.tarea-fila {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
 }
 
 .tarea:hover {
@@ -233,14 +238,14 @@ h1 span {
   border-left-color: var(--rojo);
 }
 
-.tarea input {
+.tarea-fila input[type="checkbox"] {
   width: 19px;
   height: 19px;
   accent-color: var(--verde);
   cursor: pointer;
 }
 
-.tarea span {
+.tarea-fila span {
   overflow-wrap: anywhere;
   line-height: 1.35;
 }
@@ -250,7 +255,7 @@ h1 span {
   opacity: 0.66;
 }
 
-.tarea--completada span {
+.tarea--completada .tarea-fila span {
   text-decoration: line-through;
   text-decoration-thickness: 2px;
 }
@@ -269,6 +274,52 @@ h1 span {
 
 .btn-eliminar:hover {
   background: #f9e3e1;
+}
+
+.nota-fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  padding-left: 33px;
+}
+
+.nota-input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  color: var(--tinta);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px dashed var(--linea);
+  border-radius: 3px;
+  outline: none;
+  font-size: 0.82rem;
+}
+
+.nota-input:focus {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px var(--azul-claro);
+}
+
+.btn-nota {
+  padding: 7px 9px;
+  color: var(--azul);
+  background: rgba(219, 231, 255, 0.42);
+  border: 1px solid var(--linea);
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.btn-nota:hover:not(:disabled) {
+  background: var(--azul-claro);
+}
+
+.btn-nota:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 @media (max-width: 650px) {
@@ -304,6 +355,15 @@ h1 span {
 
   .form-tarea button {
     width: 100%;
+  }
+
+  .nota-fila {
+    grid-template-columns: 1fr 1fr;
+    padding-left: 0;
+  }
+
+  .nota-input {
+    grid-column: 1 / -1;
   }
 }
 
