@@ -49,3 +49,10 @@ async function iniciar() {
 }
 
 iniciar();
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("/sw.js")
+    .then((registro) => console.log("Service Worker registrado:", registro.scope))
+    .catch((error) => console.error("No se pudo registrar el Service Worker:", error));
+}

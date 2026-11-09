@@ -5,13 +5,14 @@ Esta es la carpeta de trabajo principal. Cada guía se implementa aquí de
 forma acumulativa; las carpetas gestor-de-tareas-sesionXX se usan únicamente
 como referencia.
 
-Estado actual: Sesión 16 completada
+Estado actual: Sesión 17 completada
 -----------------------------------
 - Gestor de tareas funcional con persistencia en localStorage.
 - Web App Manifest enlazado desde index.html.
 - Nombre, colores, orientación y modo standalone configurados.
 - Iconos de 192x192 y 512x512, incluido el icono maskable.
-- El Service Worker todavía no existe; se agregará en la Sesión 17.
+- Service Worker registrado con eventos install, activate y fetch.
+- Recursos esenciales preparados durante la instalación.
 
 Cómo abrirlo
 ------------
@@ -26,6 +27,7 @@ Estructura actual
 -----------------
   index.html               interfaz y enlace al manifest
   manifest.json            configuración de instalación de la PWA
+  sw.js                    ciclo de vida inicial del Service Worker
   icons/                   iconos normal y maskable
   css/estilos.css          estilos
   app.js                   punto de entrada
