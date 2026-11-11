@@ -20,6 +20,12 @@ import {
   obtenerUbicacion,
   describirErrorUbicacion,
 } from "./dispositivo.js";
+import {
+  pedirPermisoSensores,
+  hayLecturasReales,
+  escucharOrientacion,
+  detectarSacudida,
+} from "./sensores.js";
 
 let db;
 let tareas = [];
@@ -32,8 +38,14 @@ const inputPrioridadEl = document.getElementById("input-prioridad");
 const mensajeDispositivoEl = document.getElementById("mensaje-dispositivo");
 const dialogoCamaraEl = document.getElementById("dlg-camara");
 const videoCamaraEl = document.getElementById("video-camara");
+const btnSensoresEl = document.getElementById("btn-sensores");
+const btnDeshacerEl = document.getElementById("btn-deshacer");
+const lecturaSensoresEl = document.getElementById("lectura-sensores");
 let streamCamara = null;
 let tareaDeFoto = null;
+let ultimaEliminada = null;
+let detenerSacudida = null;
+let detenerOrientacion = null;
 
 function mostrarMensajeDispositivo(texto, tipo = "informacion") {
   mensajeDispositivoEl.textContent = texto;
@@ -189,7 +201,70 @@ async function alternarCompletada(id) {
   pintarTodo();
 }
 
+async function deshacerEliminacion() {
+  if (!ultimaEliminada) {
+    return;
+  }
+
+  const { id, ...tareaRestaurada } = ultimaEliminada;
+  const nuevoId = await agregarTarea(db, tareaRestaurada);
+  tareas.push({ ...tareaRestaurada, id: nuevoId });
+  mostrarMensajeDispositivo(`Se restauró “${tareaRestaurada.titulo}”.`);
+  ultimaEliminada = null;
+  btnDeshacerEl.disabled = true;
+  pintarTodo();
+}
+
+function apagarSensores() {
+  detenerSacudida?.();
+  detenerOrientacion?.();
+  detenerSacudida = null;
+  detenerOrientacion = null;
+  lecturaSensoresEl.textContent = "";
+  btnSensoresEl.textContent = "Activar agitar para deshacer";
+  btnSensoresEl.dataset.activo = "false";
+}
+
+async function alternarSensores() {
+  if (detenerSacudida) {
+    apagarSensores();
+    mostrarMensajeDispositivo("Los sensores quedaron desactivados.");
+    return;
+  }
+
+  const permiso = await pedirPermisoSensores();
+  if (permiso === "denied") {
+    mostrarMensajeDispositivo(
+      "El acceso a los sensores fue denegado. Puedes usar el botón Deshacer eliminación.",
+      "error"
+    );
+    return;
+  }
+
+  mostrarMensajeDispositivo("Comprobando sensores de movimiento...");
+  const haySensores = permiso !== "no-soportado" && (await hayLecturasReales());
+  if (!haySensores) {
+    mostrarMensajeDispositivo(
+      "Este dispositivo no tiene sensores de movimiento. Usa el botón Deshacer eliminación."
+    );
+    return;
+  }
+
+  detenerSacudida = detectarSacudida(() => deshacerEliminacion());
+  detenerOrientacion = escucharOrientacion(({ beta, gamma }) => {
+    lecturaSensoresEl.textContent = `Inclinación β ${Math.round(beta)}° · γ ${Math.round(gamma)}°`;
+  });
+  btnSensoresEl.textContent = "Agitar para deshacer: activo";
+  btnSensoresEl.dataset.activo = "true";
+  mostrarMensajeDispositivo("Sensores activos. Agita el dispositivo para restaurar la última tarea eliminada.");
+}
+
+btnDeshacerEl.addEventListener("click", deshacerEliminacion);
+btnSensoresEl.addEventListener("click", alternarSensores);
+
 async function eliminarTarea(id) {
+  ultimaEliminada = tareas.find((elemento) => elemento.id === id) ?? null;
+  btnDeshacerEl.disabled = !ultimaEliminada;
   await eliminarTareaDB(db, id);
   tareas = tareas.filter((elemento) => elemento.id !== id);
   pintarTodo();

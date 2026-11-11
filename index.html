@@ -37,6 +37,12 @@
       <button type="submit">Agregar</button>
     </form>
 
+    <div class="barra-sensores">
+      <button type="button" id="btn-sensores">Activar agitar para deshacer</button>
+      <button type="button" id="btn-deshacer" disabled>Deshacer eliminación</button>
+      <span id="lectura-sensores" class="lectura-sensores" aria-live="off"></span>
+    </div>
+
     <p id="mensaje-dispositivo" class="mensaje-dispositivo" role="status" hidden></p>
 
     <section aria-labelledby="titulo-lista">
