@@ -137,6 +137,46 @@ iniciar().catch((error) =>
   console.error("No se pudo iniciar el almacenamiento de tareas:", error)
 );
 
+const estadoConexionEl = document.getElementById("estado-conexion");
+const btnInstalarEl = document.getElementById("btn-instalar");
+let eventoInstalacion = null;
+
+function actualizarEstadoConexion() {
+  const enLinea = navigator.onLine;
+  estadoConexionEl.textContent = enLinea
+    ? "En línea"
+    : "Sin conexión · datos guardados en el dispositivo";
+  estadoConexionEl.className = enLinea
+    ? "estado estado--en-linea"
+    : "estado estado--sin-conexion";
+}
+
+window.addEventListener("online", actualizarEstadoConexion);
+window.addEventListener("offline", actualizarEstadoConexion);
+actualizarEstadoConexion();
+
+window.addEventListener("beforeinstallprompt", (evento) => {
+  evento.preventDefault();
+  eventoInstalacion = evento;
+  btnInstalarEl.hidden = false;
+});
+
+btnInstalarEl.addEventListener("click", async () => {
+  if (!eventoInstalacion) {
+    return;
+  }
+
+  eventoInstalacion.prompt();
+  await eventoInstalacion.userChoice;
+  eventoInstalacion = null;
+  btnInstalarEl.hidden = true;
+});
+
+window.addEventListener("appinstalled", () => {
+  eventoInstalacion = null;
+  btnInstalarEl.hidden = true;
+});
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/sw.js")
