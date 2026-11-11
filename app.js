@@ -12,6 +12,14 @@ import {
   descifrarTexto,
   obtenerOCrearSal,
 } from "./crypto.js";
+import {
+  abrirCamara,
+  detenerCamara,
+  capturarFoto,
+  describirErrorCamara,
+  obtenerUbicacion,
+  describirErrorUbicacion,
+} from "./dispositivo.js";
 
 let db;
 let tareas = [];
@@ -21,8 +29,22 @@ const listaEl = document.getElementById("lista-tareas");
 const formEl = document.getElementById("form-tarea");
 const inputTituloEl = document.getElementById("input-titulo");
 const inputPrioridadEl = document.getElementById("input-prioridad");
+const mensajeDispositivoEl = document.getElementById("mensaje-dispositivo");
+const dialogoCamaraEl = document.getElementById("dlg-camara");
+const videoCamaraEl = document.getElementById("video-camara");
+let streamCamara = null;
+let tareaDeFoto = null;
+
+function mostrarMensajeDispositivo(texto, tipo = "informacion") {
+  mensajeDispositivoEl.textContent = texto;
+  mensajeDispositivoEl.dataset.tipo = tipo;
+  mensajeDispositivoEl.hidden = !texto;
+}
 
 const pintarTodo = () => {
+  listaEl
+    .querySelectorAll("img.miniatura")
+    .forEach((imagen) => URL.revokeObjectURL(imagen.src));
   listaEl.innerHTML = "";
   tareas.forEach((tarea) =>
     renderizarTarea(tarea, listaEl, {
@@ -30,9 +52,75 @@ const pintarTodo = () => {
       onEliminar: eliminarTarea,
       onGuardarNota: guardarNotaPrivada,
       onVerNota: verNotaPrivada,
+      onFoto: abrirDialogoCamara,
+      onUbicacion: adjuntarUbicacion,
     })
   );
 };
+
+async function abrirDialogoCamara(id) {
+  mostrarMensajeDispositivo("");
+  tareaDeFoto = id;
+
+  try {
+    streamCamara = await abrirCamara();
+    videoCamaraEl.srcObject = streamCamara;
+    dialogoCamaraEl.showModal();
+  } catch (error) {
+    mostrarMensajeDispositivo(describirErrorCamara(error), "error");
+  }
+}
+
+function cerrarDialogoCamara() {
+  detenerCamara(streamCamara);
+  streamCamara = null;
+  videoCamaraEl.srcObject = null;
+  if (dialogoCamaraEl.open) {
+    dialogoCamaraEl.close();
+  }
+}
+
+async function guardarFotoCapturada() {
+  const foto = await capturarFoto(videoCamaraEl);
+  const tarea = tareas.find((elemento) => elemento.id === tareaDeFoto);
+  cerrarDialogoCamara();
+
+  if (!foto || !tarea) {
+    return;
+  }
+
+  tarea.foto = foto;
+  await actualizarTarea(db, tarea);
+  mostrarMensajeDispositivo("La foto quedó guardada únicamente en este dispositivo.");
+  pintarTodo();
+}
+
+async function adjuntarUbicacion(id) {
+  mostrarMensajeDispositivo("Obteniendo ubicación...");
+
+  try {
+    const ubicacion = await obtenerUbicacion();
+    const tarea = tareas.find((elemento) => elemento.id === id);
+    tarea.ubicacion = ubicacion;
+    await actualizarTarea(db, tarea);
+    mostrarMensajeDispositivo("Ubicación guardada únicamente en este dispositivo.");
+    pintarTodo();
+  } catch (error) {
+    mostrarMensajeDispositivo(describirErrorUbicacion(error), "error");
+  }
+}
+
+document
+  .getElementById("btn-capturar")
+  .addEventListener("click", guardarFotoCapturada);
+document
+  .getElementById("btn-cancelar-camara")
+  .addEventListener("click", cerrarDialogoCamara);
+dialogoCamaraEl.addEventListener("close", () => {
+  if (streamCamara) {
+    cerrarDialogoCamara();
+  }
+});
 
 async function obtenerClaveSesion() {
   if (claveSesion) {

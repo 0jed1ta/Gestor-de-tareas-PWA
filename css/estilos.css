@@ -372,6 +372,111 @@ h1 span {
   opacity: 0.45;
 }
 
+.mensaje-dispositivo {
+  margin: -18px 0 26px;
+  padding: 11px 14px;
+  color: #5f4715;
+  background: #fff7df;
+  border: 1px solid #dfc779;
+  border-left: 5px solid #d29b32;
+  border-radius: 3px;
+  font-family: "Courier New", monospace;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.mensaje-dispositivo[data-tipo="error"] {
+  color: #7a2929;
+  background: #fff0f0;
+  border-color: #dfaaaa;
+  border-left-color: var(--rojo);
+}
+
+.adjuntos-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-top: 2px;
+  border-top: 1px dashed var(--linea);
+}
+
+.btn-adjunto {
+  padding: 7px 10px;
+  color: var(--azul);
+  background: #f6f9ff;
+  border: 1px solid #b8c8e2;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.btn-adjunto:hover {
+  background: var(--azul-claro);
+}
+
+.miniatura {
+  width: 58px;
+  height: 58px;
+  margin-left: auto;
+  object-fit: cover;
+  border: 2px solid #fff;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--linea);
+}
+
+.dato-ubicacion {
+  color: #596274;
+  font-family: "Courier New", monospace;
+  font-size: 0.67rem;
+}
+
+.dlg-camara {
+  padding: 16px;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  box-shadow: 0 24px 60px rgba(23, 35, 60, 0.3);
+}
+
+.dlg-camara::backdrop {
+  background: rgba(23, 35, 60, 0.7);
+}
+
+.dlg-camara video {
+  display: block;
+  width: min(560px, 80vw);
+  background: #101725;
+  border-radius: 3px;
+}
+
+.dlg-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.dlg-acciones button {
+  padding: 9px 14px;
+  color: var(--tinta);
+  background: #fff;
+  border: 1px solid var(--linea);
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+#btn-capturar {
+  color: #fff;
+  background: var(--azul);
+  border-color: var(--azul);
+}
+
 @media (max-width: 650px) {
   body {
     padding: 0;

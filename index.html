@@ -37,6 +37,8 @@
       <button type="submit">Agregar</button>
     </form>
 
+    <p id="mensaje-dispositivo" class="mensaje-dispositivo" role="status" hidden></p>
+
     <section aria-labelledby="titulo-lista">
       <div class="encabezado-lista">
         <h2 id="titulo-lista">Pendientes</h2>
@@ -45,6 +47,14 @@
       <ul id="lista-tareas" class="lista-tareas"></ul>
     </section>
   </main>
+
+  <dialog id="dlg-camara" class="dlg-camara">
+    <video id="video-camara" autoplay playsinline muted></video>
+    <div class="dlg-acciones">
+      <button type="button" id="btn-capturar">Capturar foto</button>
+      <button type="button" id="btn-cancelar-camara">Cancelar</button>
+    </div>
+  </dialog>
 
   <script type="module" src="app.js"></script>
 </body>

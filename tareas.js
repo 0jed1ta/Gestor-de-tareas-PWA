@@ -5,12 +5,14 @@ export const crearTarea = (titulo, prioridad = "media") => ({
   fechaCreacion: new Date().toISOString(),
   notaCifrada: null,
   notaIv: null,
+  foto: null,
+  ubicacion: null,
 });
 
 export const renderizarTarea = (
   tarea,
   contenedor,
-  { onToggle, onEliminar, onGuardarNota, onVerNota }
+  { onToggle, onEliminar, onGuardarNota, onVerNota, onFoto, onUbicacion }
 ) => {
   const li = document.createElement("li");
   li.className = `tarea tarea--${tarea.prioridad}` + (tarea.completada ? " tarea--completada" : "");
@@ -59,6 +61,41 @@ export const renderizarTarea = (
   verNota.addEventListener("click", () => onVerNota(tarea.id));
 
   notaFila.append(notaInput, guardarNota, verNota);
-  li.append(fila, notaFila);
+
+  const adjuntosFila = document.createElement("div");
+  adjuntosFila.className = "adjuntos-fila";
+
+  const btnFoto = document.createElement("button");
+  btnFoto.type = "button";
+  btnFoto.textContent = tarea.foto ? "Cambiar foto" : "Adjuntar foto";
+  btnFoto.className = "btn-adjunto";
+  btnFoto.addEventListener("click", () => onFoto(tarea.id));
+
+  const btnUbicacion = document.createElement("button");
+  btnUbicacion.type = "button";
+  btnUbicacion.textContent = tarea.ubicacion
+    ? "Actualizar ubicación"
+    : "Añadir ubicación";
+  btnUbicacion.className = "btn-adjunto";
+  btnUbicacion.addEventListener("click", () => onUbicacion(tarea.id));
+
+  adjuntosFila.append(btnFoto, btnUbicacion);
+
+  if (tarea.foto) {
+    const miniatura = document.createElement("img");
+    miniatura.className = "miniatura";
+    miniatura.alt = `Foto adjunta a ${tarea.titulo}`;
+    miniatura.src = URL.createObjectURL(tarea.foto);
+    adjuntosFila.append(miniatura);
+  }
+
+  if (tarea.ubicacion) {
+    const ubicacion = document.createElement("span");
+    ubicacion.className = "dato-ubicacion";
+    ubicacion.textContent = `${tarea.ubicacion.lat.toFixed(4)}, ${tarea.ubicacion.lon.toFixed(4)} · ±${tarea.ubicacion.precision} m`;
+    adjuntosFila.append(ubicacion);
+  }
+
+  li.append(fila, notaFila, adjuntosFila);
   contenedor.append(li);
 };
