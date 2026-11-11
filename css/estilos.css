@@ -60,6 +60,56 @@ select {
   content: "";
 }
 
+.barra-estado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 24px;
+  font-family: "Courier New", monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.estado::before {
+  width: 8px;
+  height: 8px;
+  background: currentColor;
+  border-radius: 50%;
+  content: "";
+}
+
+.estado--en-linea {
+  color: var(--verde);
+}
+
+.estado--sin-conexion {
+  color: var(--rojo);
+}
+
+#btn-instalar {
+  padding: 8px 12px;
+  color: #fff;
+  background: var(--tinta);
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+#btn-instalar:hover {
+  background: var(--azul);
+}
+
 .cabecera {
   display: grid;
   grid-template-columns: 1fr auto;

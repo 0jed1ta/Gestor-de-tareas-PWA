@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Organiza tareas por prioridad y guarda notas privadas de forma segura.">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1A1A1A">
 <title>Gestor de Tareas</title>
@@ -10,6 +11,10 @@
 </head>
 <body>
   <main class="app">
+    <div class="barra-estado" aria-live="polite">
+      <span id="estado-conexion" class="estado estado--en-linea">En línea</span>
+      <button id="btn-instalar" type="button" hidden>Instalar aplicación</button>
+    </div>
     <header class="cabecera">
       <p class="etiqueta">Cuaderno de trabajo</p>
       <h1>Mis <span>tareas</span></h1>
