@@ -1,5 +1,5 @@
 const NOMBRE_DB = "gestor-tareas-db";
-const VERSION_DB = 2;
+const VERSION_DB = 3;
 
 export function abrirBaseDeDatos() {
   return new Promise((resolve, reject) => {
@@ -23,9 +23,17 @@ export function abrirBaseDeDatos() {
       if (event.oldVersion < 2) {
         store.createIndex("porTitulo", "titulo", { unique: true });
       }
+
+      if (event.oldVersion < 3) {
+        db.createObjectStore("outbox", { keyPath: "idCambio" });
+      }
     };
 
-    peticion.onsuccess = (event) => resolve(event.target.result);
+    peticion.onsuccess = (event) => {
+      const db = event.target.result;
+      db.onversionchange = () => db.close();
+      resolve(db);
+    };
     peticion.onerror = (event) => reject(event.target.error);
   });
 }

@@ -26,6 +26,21 @@ import {
   escucharOrientacion,
   detectarSacudida,
 } from "./sensores.js";
+import {
+  estadoNotificaciones,
+  pedirPermisoNotificaciones,
+  mostrarAvisoLocal,
+  suscribirAPush,
+  suscripcionActual,
+  cancelarSuscripcion,
+  describirErrorPush,
+} from "./notificaciones.js";
+import {
+  encolarCambio,
+  contarPendientes,
+  pedirSincronizacion,
+  vaciarDesdeLaPagina,
+} from "./sync.js";
 
 let db;
 let tareas = [];
@@ -41,6 +56,11 @@ const videoCamaraEl = document.getElementById("video-camara");
 const btnSensoresEl = document.getElementById("btn-sensores");
 const btnDeshacerEl = document.getElementById("btn-deshacer");
 const lecturaSensoresEl = document.getElementById("lectura-sensores");
+const btnAvisosEl = document.getElementById("btn-avisos");
+const btnPushEl = document.getElementById("btn-push");
+const btnPushPruebaEl = document.getElementById("btn-push-prueba");
+const estadoAvisosEl = document.getElementById("estado-avisos");
+const estadoSyncEl = document.getElementById("estado-sync");
 let streamCamara = null;
 let tareaDeFoto = null;
 let ultimaEliminada = null;
@@ -281,6 +301,14 @@ formEl.addEventListener("submit", async (evento) => {
   const id = await agregarTarea(db, tareaNueva);
   tareaNueva.id = id;
   tareas.push(tareaNueva);
+  await encolarCambio(db, "crear", tareaNueva);
+  await actualizarEstadoSync();
+  try {
+    await pedirSincronizacion(db);
+  } catch {
+    mostrarMensajeDispositivo("La tarea quedó guardada y se enviará cuando vuelva la conexión.");
+  }
+  await actualizarEstadoSync();
   pintarTodo();
   formEl.reset();
 });
@@ -294,6 +322,8 @@ async function iniciar() {
     tareas = [tareaInicial];
   }
   pintarTodo();
+  await actualizarEstadoSync();
+  await actualizarControlesAvisos();
 }
 
 iniciar().catch((error) =>
@@ -346,3 +376,90 @@ if ("serviceWorker" in navigator) {
     .then((registro) => console.log("Service Worker registrado:", registro.scope))
     .catch((error) => console.error("No se pudo registrar el Service Worker:", error));
 }
+
+async function actualizarEstadoSync() {
+  if (!db) return;
+  const pendientes = await contarPendientes(db);
+  estadoSyncEl.textContent = pendientes
+    ? `${pendientes} ${pendientes === 1 ? "cambio pendiente" : "cambios pendientes"} de sincronización`
+    : "Sin cambios pendientes";
+  estadoSyncEl.classList.toggle("pendiente", pendientes > 0);
+}
+
+async function actualizarControlesAvisos() {
+  const permiso = estadoNotificaciones();
+  if (permiso === "no-soportado") {
+    estadoAvisosEl.textContent = "Avisos no disponibles";
+    btnAvisosEl.disabled = true;
+    btnPushEl.disabled = true;
+    return;
+  }
+  const suscripcion = permiso === "granted" ? await suscripcionActual().catch(() => null) : null;
+  estadoAvisosEl.textContent = permiso === "granted" ? "Avisos permitidos" : permiso === "denied" ? "Avisos bloqueados" : "Avisos desactivados";
+  btnAvisosEl.disabled = permiso === "denied";
+  btnAvisosEl.textContent = permiso === "granted" ? "Mostrar aviso local" : "Activar avisos";
+  btnPushEl.disabled = permiso !== "granted";
+  btnPushEl.textContent = suscripcion ? "Desactivar mensajes push" : "Activar mensajes push";
+  btnPushPruebaEl.disabled = !suscripcion;
+}
+
+btnAvisosEl.addEventListener("click", async () => {
+  let permiso = estadoNotificaciones();
+  if (permiso === "default") permiso = await pedirPermisoNotificaciones();
+  if (permiso === "granted") {
+    await mostrarAvisoLocal("Avisos activados", "El gestor puede recordarte tus tareas pendientes.");
+  }
+  await actualizarControlesAvisos();
+});
+
+btnPushEl.addEventListener("click", async () => {
+  try {
+    const actual = await suscripcionActual();
+    if (actual) {
+      await cancelarSuscripcion();
+      mostrarMensajeDispositivo("Los mensajes push quedaron desactivados.");
+    } else {
+      await suscribirAPush();
+      mostrarMensajeDispositivo("Los mensajes push quedaron activados.");
+    }
+  } catch (error) {
+    mostrarMensajeDispositivo(describirErrorPush(error), "error");
+  }
+  await actualizarControlesAvisos();
+});
+
+btnPushPruebaEl.addEventListener("click", async () => {
+  try {
+    const respuesta = await fetch("/api/enviar-prueba", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        titulo: "Gestor de Tareas",
+        cuerpo: "Este mensaje llegó desde el servidor.",
+        url: "/index.html",
+      }),
+    });
+    if (!respuesta.ok) throw new Error(`El servidor respondió ${respuesta.status}`);
+    mostrarMensajeDispositivo("El mensaje de prueba fue enviado.");
+  } catch (error) {
+    mostrarMensajeDispositivo(`No se pudo enviar el mensaje de prueba: ${error.message}`, "error");
+  }
+});
+
+navigator.serviceWorker?.addEventListener("message", async (evento) => {
+  if (evento.data?.tipo === "sync-completo") {
+    mostrarMensajeDispositivo(`${evento.data.enviados} ${evento.data.enviados === 1 ? "tarea sincronizada" : "tareas sincronizadas"}.`);
+    await actualizarEstadoSync();
+  }
+});
+
+window.addEventListener("online", async () => {
+  if (!db) return;
+  try {
+    await vaciarDesdeLaPagina(db);
+    await actualizarEstadoSync();
+  } catch {
+    estadoSyncEl.textContent = "Esperando conexión con el servidor";
+    estadoSyncEl.classList.add("pendiente");
+  }
+});

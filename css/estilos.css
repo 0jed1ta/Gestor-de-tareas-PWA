@@ -432,6 +432,55 @@ h1 span {
   font-variant-numeric: tabular-nums;
 }
 
+.barra-avisos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -18px 0 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--linea);
+}
+
+.barra-avisos button {
+  padding: 8px 11px;
+  color: var(--tinta);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--linea);
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.barra-avisos button:hover:not(:disabled) {
+  color: #fff;
+  background: var(--azul);
+  border-color: var(--azul);
+}
+
+.barra-avisos button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.estado-avisos,
+.estado-sync {
+  color: #596274;
+  font-family: "Courier New", monospace;
+  font-size: 0.68rem;
+}
+
+.estado-sync {
+  margin: 0 0 26px;
+}
+
+.estado-sync.pendiente {
+  color: #8a6317;
+  font-weight: 700;
+}
+
 .mensaje-dispositivo[data-tipo="error"] {
   color: #7a2929;
   background: #fff0f0;

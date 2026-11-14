@@ -1,0 +1,9 @@
+{
+  "name": "servidor-gestor-de-tareas",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Mini servidor para la Sesión 26: archivos estáticos + push + sincronización",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "web-push": "^3.6.7" }
+}

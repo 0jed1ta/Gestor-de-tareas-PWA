@@ -9,31 +9,13 @@ module.exports = {
   ],
   globIgnores: [
     "node_modules/**/*",
+    "servidor/**/*",
+    "lib/**/*",
     "workbox-config.js",
-    "workbox-*.js",
+    "sw.js",
+    "sw-propio.js",
     "package*.json",
   ],
+  swSrc: "sw-propio.js",
   swDest: "sw.js",
-  clientsClaim: true,
-  skipWaiting: true,
-  runtimeCaching: [
-    {
-      urlPattern: /\/icons\//,
-      handler: "CacheFirst",
-      options: {
-        cacheName: "imagenes",
-        expiration: {
-          maxEntries: 60,
-          maxAgeSeconds: 2592000,
-        },
-      },
-    },
-    {
-      urlPattern: /\/api\//,
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "api-tareas",
-      },
-    },
-  ],
 };
