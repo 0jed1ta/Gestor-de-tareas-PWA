@@ -8,7 +8,7 @@ const RAIZ = path.join(__dirname, "..");
 const DIRECTORIO_DATOS = process.env.DATA_DIR || __dirname;
 const ARCHIVO_CLAVES = path.join(DIRECTORIO_DATOS, "claves-vapid.json");
 const ARCHIVO_DATOS = path.join(DIRECTORIO_DATOS, "datos.json");
-const ORIGEN_PERMITIDO = process.env.FRONTEND_ORIGIN || "https://oledita.github.io";
+const ORIGEN_PERMITIDO = process.env.FRONTEND_ORIGIN || "https://0jed1ta.github.io";
 
 let claves;
 if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
