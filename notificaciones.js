@@ -1,3 +1,5 @@
+import { API_URL } from "./api-config.js";
+
 export function estadoNotificaciones() {
   return "Notification" in window ? Notification.permission : "no-soportado";
 }
@@ -31,13 +33,16 @@ export async function suscribirAPush() {
   if (!("pushManager" in registro)) {
     throw new Error("push-no-soportado");
   }
-  const respuestaClave = await fetch("/api/clave-publica");
+  const respuestaClave = await fetch(`${API_URL}/api/clave-publica`);
+  if (!respuestaClave.ok) {
+    throw new Error(`No se pudo obtener la clave pública (${respuestaClave.status})`);
+  }
   const { clave } = await respuestaClave.json();
   const suscripcion = await registro.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ABytes(clave),
   });
-  const respuesta = await fetch("/api/suscribir", {
+  const respuesta = await fetch(`${API_URL}/api/suscribir`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(suscripcion.toJSON()),
@@ -61,7 +66,7 @@ export async function cancelarSuscripcion() {
   if (!suscripcion) {
     return false;
   }
-  await fetch("/api/desuscribir", {
+  await fetch(`${API_URL}/api/desuscribir`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ endpoint: suscripcion.endpoint }),

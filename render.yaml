@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: gestor-tareas-pwa-api
+    runtime: node
+    rootDir: servidor
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: FRONTEND_ORIGIN
+        value: https://oledita.github.io

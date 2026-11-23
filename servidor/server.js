@@ -5,17 +5,29 @@ const webpush = require("web-push");
 
 const PUERTO = process.env.PORT || 3000;
 const RAIZ = path.join(__dirname, "..");
-const ARCHIVO_CLAVES = path.join(__dirname, "claves-vapid.json");
-const ARCHIVO_DATOS = path.join(__dirname, "datos.json");
+const DIRECTORIO_DATOS = process.env.DATA_DIR || __dirname;
+const ARCHIVO_CLAVES = path.join(DIRECTORIO_DATOS, "claves-vapid.json");
+const ARCHIVO_DATOS = path.join(DIRECTORIO_DATOS, "datos.json");
+const ORIGEN_PERMITIDO = process.env.FRONTEND_ORIGIN || "https://oledita.github.io";
 
 let claves;
-if (fs.existsSync(ARCHIVO_CLAVES)) {
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+  claves = {
+    publicKey: process.env.VAPID_PUBLIC_KEY,
+    privateKey: process.env.VAPID_PRIVATE_KEY,
+  };
+} else if (fs.existsSync(ARCHIVO_CLAVES)) {
   claves = JSON.parse(fs.readFileSync(ARCHIVO_CLAVES, "utf8"));
 } else {
+  fs.mkdirSync(DIRECTORIO_DATOS, { recursive: true });
   claves = webpush.generateVAPIDKeys();
   fs.writeFileSync(ARCHIVO_CLAVES, JSON.stringify(claves, null, 2));
 }
-webpush.setVapidDetails("mailto:juan.ojeda@uptc.edu.co", claves.publicKey, claves.privateKey);
+webpush.setVapidDetails(
+  process.env.VAPID_SUBJECT || "mailto:juan.ojeda@uptc.edu.co",
+  claves.publicKey,
+  claves.privateKey
+);
 
 function leerDatos() {
   try {
@@ -57,7 +69,12 @@ function leerCuerpo(peticion) {
 }
 
 function responder(respuesta, codigo, objeto) {
-  respuesta.writeHead(codigo, { "Content-Type": "application/json; charset=utf-8" });
+  respuesta.writeHead(codigo, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Access-Control-Allow-Origin": ORIGEN_PERMITIDO,
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  });
   respuesta.end(JSON.stringify(objeto));
 }
 
@@ -112,6 +129,17 @@ async function atenderApi(peticion, respuesta, ruta) {
 http.createServer(async (peticion, respuesta) => {
   try {
     const ruta = decodeURIComponent(new URL(peticion.url, "http://localhost").pathname);
+    if (peticion.method === "OPTIONS") {
+      respuesta.writeHead(204, {
+        "Access-Control-Allow-Origin": ORIGEN_PERMITIDO,
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      });
+      return respuesta.end();
+    }
+    if (peticion.method === "GET" && ruta === "/health") {
+      return responder(respuesta, 200, { ok: true });
+    }
     if (ruta.startsWith("/api/")) return await atenderApi(peticion, respuesta, ruta);
     const archivo = path.normalize(path.join(RAIZ, ruta === "/" ? "index.html" : ruta));
     if (!archivo.startsWith(`${RAIZ}${path.sep}`) || archivo.startsWith(`${__dirname}${path.sep}`)) {

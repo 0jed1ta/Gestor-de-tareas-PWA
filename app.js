@@ -35,6 +35,7 @@ import {
   cancelarSuscripcion,
   describirErrorPush,
 } from "./notificaciones.js";
+import { API_URL } from "./api-config.js";
 
 let db;
 let tareas = [];
@@ -409,7 +410,7 @@ btnPushEl.addEventListener("click", async () => {
 
 btnPushPruebaEl.addEventListener("click", async () => {
   try {
-    const respuesta = await fetch("/api/enviar-prueba", {
+    const respuesta = await fetch(`${API_URL}/api/enviar-prueba`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
