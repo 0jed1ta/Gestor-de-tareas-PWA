@@ -466,19 +466,14 @@ h1 span {
 }
 
 .estado-avisos,
-.estado-sync {
+.estado-local {
   color: #596274;
   font-family: "Courier New", monospace;
   font-size: 0.68rem;
 }
 
-.estado-sync {
+.estado-local {
   margin: 0 0 26px;
-}
-
-.estado-sync.pendiente {
-  color: #8a6317;
-  font-weight: 700;
 }
 
 .mensaje-dispositivo[data-tipo="error"] {

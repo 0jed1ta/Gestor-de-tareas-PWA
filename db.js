@@ -1,5 +1,5 @@
 const NOMBRE_DB = "gestor-tareas-db";
-const VERSION_DB = 3;
+const VERSION_DB = 4;
 
 export function abrirBaseDeDatos() {
   return new Promise((resolve, reject) => {
@@ -24,8 +24,8 @@ export function abrirBaseDeDatos() {
         store.createIndex("porTitulo", "titulo", { unique: true });
       }
 
-      if (event.oldVersion < 3) {
-        db.createObjectStore("outbox", { keyPath: "idCambio" });
+      if (event.oldVersion < 4 && db.objectStoreNames.contains("outbox")) {
+        db.deleteObjectStore("outbox");
       }
     };
 

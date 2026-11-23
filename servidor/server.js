@@ -21,7 +21,7 @@ function leerDatos() {
   try {
     return JSON.parse(fs.readFileSync(ARCHIVO_DATOS, "utf8"));
   } catch {
-    return { suscripciones: [], tareas: [], idsRecibidos: [] };
+    return { suscripciones: [] };
   }
 }
 
@@ -105,22 +105,6 @@ async function atenderApi(peticion, respuesta, ruta) {
     }
     guardarDatos(datos);
     return responder(respuesta, 200, resultado);
-  }
-  if (peticion.method === "POST" && ruta === "/api/tareas") {
-    const cambio = await leerCuerpo(peticion);
-    if (!cambio.idCambio || !cambio.datos?.titulo) {
-      return responder(respuesta, 400, { error: "cambio inválido" });
-    }
-    if (datos.idsRecibidos.includes(cambio.idCambio)) {
-      return responder(respuesta, 200, { ok: true, duplicado: true });
-    }
-    datos.idsRecibidos.push(cambio.idCambio);
-    datos.tareas.push({ ...cambio.datos, idCambio: cambio.idCambio, recibidaEn: new Date().toISOString() });
-    guardarDatos(datos);
-    return responder(respuesta, 201, { ok: true });
-  }
-  if (peticion.method === "GET" && ruta === "/api/tareas") {
-    return responder(respuesta, 200, { tareas: datos.tareas });
   }
   return responder(respuesta, 404, { error: "ruta de API desconocida" });
 }

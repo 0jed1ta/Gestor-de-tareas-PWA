@@ -35,12 +35,6 @@ import {
   cancelarSuscripcion,
   describirErrorPush,
 } from "./notificaciones.js";
-import {
-  encolarCambio,
-  contarPendientes,
-  pedirSincronizacion,
-  vaciarDesdeLaPagina,
-} from "./sync.js";
 
 let db;
 let tareas = [];
@@ -60,7 +54,6 @@ const btnAvisosEl = document.getElementById("btn-avisos");
 const btnPushEl = document.getElementById("btn-push");
 const btnPushPruebaEl = document.getElementById("btn-push-prueba");
 const estadoAvisosEl = document.getElementById("estado-avisos");
-const estadoSyncEl = document.getElementById("estado-sync");
 let streamCamara = null;
 let tareaDeFoto = null;
 let ultimaEliminada = null;
@@ -297,20 +290,16 @@ formEl.addEventListener("submit", async (evento) => {
     return;
   }
 
-  const tareaNueva = crearTarea(titulo, inputPrioridadEl.value);
-  const id = await agregarTarea(db, tareaNueva);
-  tareaNueva.id = id;
-  tareas.push(tareaNueva);
-  await encolarCambio(db, "crear", tareaNueva);
-  await actualizarEstadoSync();
   try {
-    await pedirSincronizacion(db);
-  } catch {
-    mostrarMensajeDispositivo("La tarea quedó guardada y se enviará cuando vuelva la conexión.");
+    const tareaNueva = crearTarea(titulo, inputPrioridadEl.value);
+    tareaNueva.id = await agregarTarea(db, tareaNueva);
+    tareas.push(tareaNueva);
+    pintarTodo();
+    formEl.reset();
+  } catch (error) {
+    console.error("No se pudo guardar la tarea:", error);
+    mostrarMensajeDispositivo("No se pudo guardar la tarea en este dispositivo.", "error");
   }
-  await actualizarEstadoSync();
-  pintarTodo();
-  formEl.reset();
 });
 
 async function iniciar() {
@@ -322,7 +311,6 @@ async function iniciar() {
     tareas = [tareaInicial];
   }
   pintarTodo();
-  await actualizarEstadoSync();
   await actualizarControlesAvisos();
 }
 
@@ -372,18 +360,9 @@ window.addEventListener("appinstalled", () => {
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
-    .register("/sw.js")
+    .register(new URL("sw.js", import.meta.url))
     .then((registro) => console.log("Service Worker registrado:", registro.scope))
     .catch((error) => console.error("No se pudo registrar el Service Worker:", error));
-}
-
-async function actualizarEstadoSync() {
-  if (!db) return;
-  const pendientes = await contarPendientes(db);
-  estadoSyncEl.textContent = pendientes
-    ? `${pendientes} ${pendientes === 1 ? "cambio pendiente" : "cambios pendientes"} de sincronización`
-    : "Sin cambios pendientes";
-  estadoSyncEl.classList.toggle("pendiente", pendientes > 0);
 }
 
 async function actualizarControlesAvisos() {
@@ -443,23 +422,5 @@ btnPushPruebaEl.addEventListener("click", async () => {
     mostrarMensajeDispositivo("El mensaje de prueba fue enviado.");
   } catch (error) {
     mostrarMensajeDispositivo(`No se pudo enviar el mensaje de prueba: ${error.message}`, "error");
-  }
-});
-
-navigator.serviceWorker?.addEventListener("message", async (evento) => {
-  if (evento.data?.tipo === "sync-completo") {
-    mostrarMensajeDispositivo(`${evento.data.enviados} ${evento.data.enviados === 1 ? "tarea sincronizada" : "tareas sincronizadas"}.`);
-    await actualizarEstadoSync();
-  }
-});
-
-window.addEventListener("online", async () => {
-  if (!db) return;
-  try {
-    await vaciarDesdeLaPagina(db);
-    await actualizarEstadoSync();
-  } catch {
-    estadoSyncEl.textContent = "Esperando conexión con el servidor";
-    estadoSyncEl.classList.add("pendiente");
   }
 });

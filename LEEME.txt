@@ -24,6 +24,8 @@ Estado actual: Sesión 22 completada
 - Base de datos versionada con índices por prioridad y título.
 - Operaciones CRUD y consultas mediante cursor sobre las tareas.
 - Notas privadas cifradas con AES-GCM y claves derivadas con PBKDF2.
+- Tareas y datos asociados guardados localmente en IndexedDB, sin sincronización
+  entre dispositivos ni envío de tareas al servidor.
 
 Cómo abrirlo
 ------------
